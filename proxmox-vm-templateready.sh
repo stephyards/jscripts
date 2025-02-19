@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 # Ensure the script is run as root
 if [[ $EUID -ne 0 ]]; then
@@ -10,19 +10,19 @@ fi
 DISTRO="$(. /etc/os-release && echo "$ID")"
 echo "Detected Linux distribution: $DISTRO"
 
-# Install Cloud-Init based on distribution
+# Install Cloud-Init and QEMU Guest Agent based on distribution
 case "$DISTRO" in
     ubuntu|debian|kali)
-        echo "Installing Cloud-Init for Debian-based system..."
-        apt update && apt install -y cloud-init
+        echo "Installing Cloud-Init and QEMU Guest Agent for Debian-based system..."
+        apt update && apt install -y cloud-init qemu-guest-agent
         ;;
     centos|rhel|rocky|almalinux)
-        echo "Installing Cloud-Init for RHEL-based system..."
-        yum install -y cloud-init
+        echo "Installing Cloud-Init and QEMU Guest Agent for RHEL-based system..."
+        yum install -y cloud-init qemu-guest-agent
         ;;
     fedora)
-        echo "Installing Cloud-Init for Fedora..."
-        dnf install -y cloud-init
+        echo "Installing Cloud-Init and QEMU Guest Agent for Fedora..."
+        dnf install -y cloud-init qemu-guest-agent
         ;;
     *)
         echo "Unsupported distribution: $DISTRO" >&2
@@ -31,11 +31,14 @@ case "$DISTRO" in
 esac
 
 if [[ $? -ne 0 ]]; then
-    echo "Failed to install Cloud-Init. Exiting..." >&2
+    echo "Failed to install Cloud-Init or QEMU Guest Agent. Exiting..." >&2
     exit 1
 fi
 
-echo "Cloud-Init installed successfully."
+echo "Cloud-Init and QEMU Guest Agent installed successfully."
+
+# Enable and start QEMU Guest Agent
+systemctl enable --now qemu-guest-agent
 
 # Remove existing SSH host keys
 echo "Removing SSH host keys to allow regeneration on first boot..."
