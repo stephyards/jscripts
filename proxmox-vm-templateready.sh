@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Ensure the script is run as root
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root!" >&2
@@ -11,11 +12,11 @@ echo "Detected Linux distribution: $DISTRO"
 
 # Install Cloud-Init based on distribution
 case "$DISTRO" in
-    ubuntu|debian)
+    ubuntu|debian|kali)
         echo "Installing Cloud-Init for Debian-based system..."
         apt update && apt install -y cloud-init
         ;;
-    centos|rhel|rocky|almalinux)
+    centos|rhel|rocky|almalinux|fedora)
         echo "Installing Cloud-Init for RHEL-based system..."
         yum install -y epel-release && yum install -y cloud-init
         ;;
@@ -47,10 +48,10 @@ echo "Machine ID reset successfully."
 # Clean up package cache
 echo "Cleaning up system..."
 case "$DISTRO" in
-    ubuntu|debian)
+    ubuntu|debian|kali)
         apt autoremove -y && apt clean
         ;;
-    centos|rhel|rocky|almalinux)
+    centos|rhel|rocky|almalinux|fedora)
         yum autoremove -y && yum clean all
         ;;
 esac
