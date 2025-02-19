@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/bash
 
 # Ensure the script is run as root
 if [[ $EUID -ne 0 ]]; then
@@ -16,9 +16,13 @@ case "$DISTRO" in
         echo "Installing Cloud-Init for Debian-based system..."
         apt update && apt install -y cloud-init
         ;;
-    centos|rhel|rocky|almalinux|fedora)
+    centos|rhel|rocky|almalinux)
         echo "Installing Cloud-Init for RHEL-based system..."
-        yum install -y epel-release && yum install -y cloud-init
+        yum install -y cloud-init
+        ;;
+    fedora)
+        echo "Installing Cloud-Init for Fedora..."
+        dnf install -y cloud-init
         ;;
     *)
         echo "Unsupported distribution: $DISTRO" >&2
@@ -51,8 +55,11 @@ case "$DISTRO" in
     ubuntu|debian|kali)
         apt autoremove -y && apt clean
         ;;
-    centos|rhel|rocky|almalinux|fedora)
+    centos|rhel|rocky|almalinux)
         yum autoremove -y && yum clean all
+        ;;
+    fedora)
+        dnf autoremove -y && dnf clean all
         ;;
 esac
 
